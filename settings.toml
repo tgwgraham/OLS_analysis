@@ -1,0 +1,41 @@
+
+######################################
+#  parameters for particle tracking  #
+######################################
+
+# Image reading and filtering settings
+[filter]
+    start = 0 
+    method = "identity"
+    chunk_size = 100
+
+# Spot detection settings
+[detect]
+    method = "llr"  # llr = log likelihood ratio
+    k = 1.0  # width of Gaussian
+    w = 9    # window size
+    t = 18.0 # threshold (actual threshold, not rescaled arbitrarily)
+
+# Subpixel localization settings
+[localize]
+    method = 'ls_int_gaussian' # least-squares sub-pixel localization using integrated Gaussian model w/ Gaussian-distributed noise
+    window_size = 9
+    sigma = 1.0
+    ridge = 0.001
+    max_iter = 10
+    damp = 0.3
+
+# Tracking settings
+[track]
+    method = 'conservative'
+    pixel_size_um = 0.108 # for most cameras
+    frame_interval = 0.0075 # change appropriately
+    search_radius = 1 # in microns--maximum permitted between frames
+    max_blinks = 0
+    min_I0 = 0.0 # minimum PSF intensity for spot detection to start a trajectory
+    scale = 7.0  
+
+
+
+
+
