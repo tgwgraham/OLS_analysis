@@ -1,0 +1,17 @@
+# segmentation settings
+
+thresh1 = 120.0  # minimum intensity threshold for nuclei
+thresh2 = -5  # maximum intensity threshold for excluding nuclear boundaries
+rad1 = 3  # radius for narrow Gaussian blur
+rad2 = 11  # radius for wide Gaussian blur
+
+outf = "test3"  # base file name for output TIF and CSV files
+size_threshold = 1000  # minimum size for ROIs
+
+miny = 64  # minimum y-bound for smaller imaging region
+maxy = 320  # maximum y-bound for smaller imaging region
+
+other_imfnames = []  # other image file names for integrated intensities
+
+dilation_strelsize = 3  # size of structuring element to use for dilation
+dilation_nrounds = 3  # number of times to apply the dilation operation
