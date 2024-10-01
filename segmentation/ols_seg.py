@@ -56,14 +56,15 @@ def dilate_labels(label_array,strelsize=3,nrounds=3):
 
     return label_array
 
-def segmentfile(fname,
+def segmentfolder(fname,
                 thresh1=120.0, thresh2=-5, rad1=3, rad2=11,
                 outf=None,size_threshold=None,
                 miny = None, maxy = None,
                 other_imfnames = None,
                 dilation_strelsize=3,dilation_nrounds=3,
                ):
-    # segments image to produce nuclear ROIs for further analysis
+    # segments all TIF images in a folder
+    # fname - folder name
     # thresh1 - minimum intensity threshold for nuclei
     # thresh2 - maximum intensity threshold for excluding nuclear boundaries
     # rad1 - radius for narrow Gaussian blur
@@ -219,7 +220,7 @@ if __name__ == '__main__':
 
     # Loop over all TIF files in the input folder
     for f in fnames:
-        segmentfile(
+        segmentfolder(
             fname=f,
             outf=f'{outfolder}/{os.path.basename(f)[:-4]}',
             thresh1=config.get('thresh1', 120.0),

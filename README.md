@@ -15,3 +15,13 @@ Runs SASPT on all TIF files with the same prefix. The prefix is defined as the p
 
 ## track_and_saspt.sh
 Short bash script to run tracking and SASPT.
+
+## segmentation
+### ols_seg.py
+Script that segments all TIF files in a folder.
+
+### run_ols_seg.sh
+Wrapper script that runs ols_seg.py
+
+### segmentation_settings.toml
+Settings file for segmentation.
