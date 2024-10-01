@@ -5,7 +5,6 @@ thresh2 = -5  # maximum intensity threshold for excluding nuclear boundaries
 rad1 = 3  # radius for narrow Gaussian blur
 rad2 = 11  # radius for wide Gaussian blur
 
-outf = "test3"  # base file name for output TIF and CSV files
 size_threshold = 1000  # minimum size for ROIs
 
 miny = 64  # minimum y-bound for smaller imaging region

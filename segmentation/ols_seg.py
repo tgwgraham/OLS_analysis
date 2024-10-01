@@ -8,6 +8,14 @@ from skimage.measure import label, regionprops
 import pandas as pd
 import sys
 import toml
+import os
+from glob import glob
+
+# TG 20241001 - modified the main script to process all the TIF files in a folder
+# new input command line arguments are:
+# 1) input folder name
+# 2) output folder name
+# 3) settings file name
 
 def dilate_labels(label_array,strelsize=3,nrounds=3):
     # dilates regions labeled with different numbers in a 2D label_array
@@ -201,21 +209,28 @@ def segmentfile(fname,
 
 if __name__ == '__main__':
 
-    config = toml.load(sys.argv[2])
+    config = toml.load(sys.argv[3])
     
-    # Pass the parameters to segmentfile
-    segmentfile(
-        fname=sys.argv[1],
-        thresh1=config.get('thresh1', 120.0),
-        thresh2=config.get('thresh2', -5),
-        rad1=config.get('rad1', 3),
-        rad2=config.get('rad2', 11),
-        outf=config.get('outf', None),
-        size_threshold=config.get('size_threshold', None),
-        miny=config.get('miny', None),
-        maxy=config.get('maxy', None),
-        other_imfnames=config.get('other_imfnames', None),
-        dilation_strelsize=config.get('dilation_strelsize', 3),
-        dilation_nrounds=config.get('dilation_nrounds', 3)
-    )
+    infolder = sys.argv[1]
+    outfolder = sys.argv[2]
+    
+    fnames = glob(infolder + '/*tif')
+    os.makedirs(outfolder,exist_ok=True)
+
+    # Loop over all TIF files in the input folder
+    for f in fnames:
+        segmentfile(
+            fname=f,
+            outf=f'{outfolder}/{os.path.basename(f)[:-4]}',
+            thresh1=config.get('thresh1', 120.0),
+            thresh2=config.get('thresh2', -5),
+            rad1=config.get('rad1', 3),
+            rad2=config.get('rad2', 11),
+            size_threshold=config.get('size_threshold', None),
+            miny=config.get('miny', None),
+            maxy=config.get('maxy', None),
+            other_imfnames=config.get('other_imfnames', None),
+            dilation_strelsize=config.get('dilation_strelsize', 3),
+            dilation_nrounds=config.get('dilation_nrounds', 3)
+        )
         
