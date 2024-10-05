@@ -1,16 +1,17 @@
 # segmentation settings
 
-thresh1 = 120.0  # minimum intensity threshold for nuclei
-thresh2 = -5  # maximum intensity threshold for excluding nuclear boundaries
+thresh1 = 5000  # minimum intensity threshold for nuclei
+thresh2 = -500  # maximum intensity threshold for excluding nuclear boundaries
 rad1 = 3  # radius for narrow Gaussian blur
 rad2 = 11  # radius for wide Gaussian blur
 
-size_threshold = 1000  # minimum size for ROIs
+size_threshold = 5000  # minimum size for ROIs
 
-miny = 64  # minimum y-bound for smaller imaging region
-maxy = 320  # maximum y-bound for smaller imaging region
+# ybounds = [64,320]  # minimum y-bound for smaller imaging region
 
 other_imfnames = []  # other image file names for integrated intensities
 
 dilation_strelsize = 3  # size of structuring element to use for dilation
-dilation_nrounds = 3  # number of times to apply the dilation operation
+dilation_nrounds = 6  # number of times to apply the dilation operation
+
+pretty_output = true # Whether to make pretty jpg plots for visualization purposes in addition to tifs for segmentation

@@ -10,6 +10,9 @@ import sys
 import toml
 import os
 from glob import glob
+from matplotlib import pyplot as plt
+import matplotlib.colors as mcolors
+
 
 # TG 20241001 - modified the main script to process all the TIF files in a folder
 # new input command line arguments are:
@@ -55,23 +58,81 @@ def dilate_labels(label_array,strelsize=3,nrounds=3):
         label_array[(binary_mask == 1) & (label_array == 0)] = label
 
     return label_array
+    
+def plot_labeled_contours(image, label_array, regiondf, outfname=None):
+    # Convert the image to grayscale for plotting if it is not already
+    if len(image.shape) == 3:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray_image = image
 
-def segmentfolder(fname,
+    # Plot the image using imshow
+    plt.figure(figsize=(20,20))
+    plt.imshow(gray_image, cmap='gray')
+    
+    # Get the unique labels (excluding background 0)
+    unique_labels = np.unique(label_array)
+    unique_labels = unique_labels[unique_labels != 0]
+
+    # Generate a color map for different labels
+    colormap = plt.cm.get_cmap('hsv', len(unique_labels))
+    norm = mcolors.Normalize(vmin=min(unique_labels), vmax=max(unique_labels))
+
+    for label in unique_labels:
+        # Create a binary mask for the current label
+        binary_mask = (label_array == label).astype(np.uint8)
+
+        # Find contours in the binary mask
+        contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Get the color for the current label
+        color = colormap(norm(label))[:3]  # Get RGB values from the colormap
+
+        # Plot each contour
+        for contour in contours:
+            contour = contour.squeeze()
+            if contour.ndim == 2:  # Ensure the contour has correct shape
+                contour = np.vstack([contour, contour[0]])
+                plt.plot(contour[:, 0], contour[:, 1], color=color, linewidth=1)
+
+                # Overlay the text for each region
+    for _, row in regiondf.iterrows():
+        # Extract information from the DataFrame
+        label_value = int(row['label'])
+        x_centroid = row['x_centroid']
+        y_centroid = row['y_centroid']
+        #fraction_within_bounds = row['fraction_within_bounds']
+
+        # Overlay the label (in white)
+        plt.text(y_centroid,x_centroid, str(label_value),
+                 color='white', fontsize=12, ha='center', va='center',
+                 bbox=dict(facecolor='black', alpha=0.5, edgecolor='none'))
+        
+    # Show the plot with the overlaid contours
+    plt.axis('off')
+    
+    if outfname is not None:
+        plt.savefig(outfname,dpi=300,bbox_inches='tight')
+    else:
+        plt.show()
+    
+
+def segmentfile(fname,
                 thresh1=120.0, thresh2=-5, rad1=3, rad2=11,
                 outf=None,size_threshold=None,
-                miny = None, maxy = None,
+                ybounds = None,
                 other_imfnames = None,
                 dilation_strelsize=3,dilation_nrounds=3,
+                pretty_output=True,
                ):
-    # segments all TIF images in a folder
-    # fname - folder name
+    # segments image to produce nuclear ROIs for further analysis
     # thresh1 - minimum intensity threshold for nuclei
     # thresh2 - maximum intensity threshold for excluding nuclear boundaries
     # rad1 - radius for narrow Gaussian blur
     # rad2 - radius for wide Gaussian blur
     # outf - optional; base file name for output TIF and CSV files. No output if this is set to None.
     # size_threshold - minimum size for ROIs.
-    # miny and maxy - minimum and maximum bounds (min inclusive, max not) for smaller ROI.
+    # ybounds - array with minimum and maximum bounds (min inclusive, max not) for smaller ROI.
     #                 This is useful if you use an imaging ROI that is smaller than the pre-image
     # other_imfnames - list of other image file names for getting integrated intensities within ROIs in
     #                 those images (e.g., other fluorescence channels)
@@ -102,7 +163,7 @@ def segmentfolder(fname,
     
     num_labels, labeled_image = cv2.connectedComponents(filled_mask.astype(np.uint8))
 
-    dilabel = dilate_labels(labeled_image)
+    dilabel = dilate_labels(labeled_image,strelsize=dilation_strelsize,nrounds=dilation_nrounds)
     
     if size_threshold is not None:
         # Find the size of each region
@@ -174,7 +235,10 @@ def segmentfolder(fname,
     # if y-bounds for smaller imaging region are specified, then get the fraction of pixels for each ROI that
     # fall within that smaller imaging region
     
-    if miny is not None and maxy is not None:
+    if ybounds is not None:
+        miny = ybounds[0]
+        maxy = ybounds[1]
+        
         # Get the coordinates of all pixels in the labeled array
         coords = np.array(np.nonzero(dilabel)).T  # This gives array of [y, x] pairs
 
@@ -199,11 +263,15 @@ def segmentfolder(fname,
     
         
     if outf is not None: # write output
-        image = Image.fromarray(dilabel.astype('uint16'))
-        image.save(f'{outf}.tif')
+        output_image = Image.fromarray(dilabel.astype('uint16'))
+        output_image.save(f'{outf}.tif')
         
         # write out region properties
         region_df.to_csv(f'{outf}.csv')
+    
+        if pretty_output: # make easy to read overlays of segmented ROIs on the original image
+            plot_labeled_contours(image, dilabel, region_df, outfname=f'{outf}_overlay.jpg')
+            plt.close('all')
     
     return dilabel, region_df 
 
@@ -215,12 +283,12 @@ if __name__ == '__main__':
     infolder = sys.argv[1]
     outfolder = sys.argv[2]
     
-    fnames = glob(infolder + '/*tif')
+    fnames = glob(infolder + '*tif')
     os.makedirs(outfolder,exist_ok=True)
 
     # Loop over all TIF files in the input folder
     for f in fnames:
-        segmentfolder(
+        segmentfile(
             fname=f,
             outf=f'{outfolder}/{os.path.basename(f)[:-4]}',
             thresh1=config.get('thresh1', 120.0),
@@ -228,10 +296,10 @@ if __name__ == '__main__':
             rad1=config.get('rad1', 3),
             rad2=config.get('rad2', 11),
             size_threshold=config.get('size_threshold', None),
-            miny=config.get('miny', None),
-            maxy=config.get('maxy', None),
+            ybounds=config.get('ybounds', None),
             other_imfnames=config.get('other_imfnames', None),
             dilation_strelsize=config.get('dilation_strelsize', 3),
-            dilation_nrounds=config.get('dilation_nrounds', 3)
+            dilation_nrounds=config.get('dilation_nrounds', 3),
+            pretty_output=config.get('pretty_output', True)
         )
         

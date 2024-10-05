@@ -1,1 +1,1 @@
-python ols_seg.py ../Halo masks segmentation_settings.toml
+python ols_seg.py ../../H masks segmentation_settings.toml
