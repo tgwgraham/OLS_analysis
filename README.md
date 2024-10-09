@@ -25,3 +25,9 @@ Wrapper script that runs ols_seg.py
 
 ### segmentation_settings.toml
 Settings file for segmentation.
+
+### sort_all.py
+Sorts trajectories from tracked CSV files by cell. Makes a folder for each field of view containing one CSV file per cell. 0.csv contains background trajectories not in any cell.
+
+### check_sorting.ipynb
+Can be used to make overlay plots to check the quality of trajectory sorting.
