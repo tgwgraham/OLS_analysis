@@ -133,18 +133,14 @@ if __name__ == '__main__':
         
     # get mask TIF file names
     masknames = glob(f'{maskfolder}/{maskprefix}*tif')
-    
     # loop over each mask file and sort trajectories from corresponding trajectory file(s)
-    for maskname in masknames:
-        #index = os.path.basename(maskname)[1:-4]
-        # modified this to cope with poor file naming in 11-24 experiment
-        index = os.path.basename(maskname)[1:26]
+    for j in range(len(masknames)):
         for prefix in prefixes:
-            possible_trajfiles = glob(f'{trackfolder}{prefix}{index}*_trajs.csv')
+            possible_trajfiles = glob(f'{trackfolder}{prefix}_{j:04d}*_trajs.csv')
             for trajfile in possible_trajfiles:
                 if os.path.exists(trajfile):
-                    trajbyroi(maskname,trajfile,outfolder,write_background=write_background)
+                    trajbyroi(masknames[j],trajfile,outfolder,write_background=write_background)
                 else:
                     print(f'Warning: {trajfile} not found.')
-                print(maskname,trajfile)
+                print(masknames[j],trajfile)
 
