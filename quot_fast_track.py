@@ -17,7 +17,8 @@ options:
 -o --out_dir            output directory
 -c --contains           string that file name must contain
 
-
+# TG 20241217 - this version, which goes with declutter2.py, tracks files in different subfolders, whose
+# names are identical to the file name prefixes.
 
 """
 # Filepaths
@@ -47,7 +48,8 @@ ACCEPTABLE_EXTS = [".nd2", ".tif", ".tiff"]     # If passed just one file
 
 def localize_frames(movie_path: str, 
                     n_threads: int=4, 
-                    out_dir: str=None, 
+                    out_dir: str=None,
+                    subset_to_track=None,
                     **kwargs):
     """
     Run detection and subpixel localization by frame-wise parallelization.
@@ -89,7 +91,10 @@ def localize_frames(movie_path: str,
                                   **kwargs['localize']).assign(frame=frame_idx)
 
         # Run the driver function on each frame lazily
-        tasks = [driver(i, frame) for i, frame in enumerate(fh)]
+        if subset_to_track is not None:
+            tasks = [driver(i, frame) for i, frame in enumerate(fh) if i in subset_to_track]
+        else:
+            tasks = [driver(i, frame) for i, frame in enumerate(fh)]
         scheduler = "single-threaded" if n_threads == 1 else "processes"
         with ProgressBar():
             print(f"Detecting and localizing spots in {movie_path} with {n_threads} threads.")
@@ -155,7 +160,11 @@ def quot_fast_track(target_path: str,
                     ext: str=".nd2", 
                     n_threads: int=1, 
                     out_dir: str=None, 
-                    contains: str="*"):
+                    contains: str="*",
+                    subset_to_track=None,
+                    ):
+    # TG 20240918: added subset_to_track option. If this is set to None, then it will track all frames
+    # Otherwise, it will only track frames in the subset.
     # If passed an image file, track without checking for ext or contains
     if os.path.isfile(target_path) and os.path.splitext(target_path)[-1] in ACCEPTABLE_EXTS:
         files_to_track = [target_path]
@@ -165,6 +174,15 @@ def quot_fast_track(target_path: str,
     # Else raise an error
     else:
         raise RuntimeError(f"Not a file or directory: {target_path}")
+    
+    # ignore files that have already been tracked
+    already_tracked = glob(out_dir + "*csv")
+    files_to_track = [f for f in files_to_track if out_dir + f[len(target_path)+1:-4] + "_trajs.csv" not in already_tracked]
+    
+    # MODIFIED BY TG
+    # specify strings to exclude (this prevents it from tracking snapshot files or non-renamed files)
+    exclude_strings = ['H','S']
+    files_to_track = [f for f in files_to_track if not any(e in f for e in exclude_strings)]
     
     # Try to load config
     try:
@@ -176,9 +194,11 @@ def quot_fast_track(target_path: str,
     # keeping track of the output files
     output_files = []
     for file in files_to_track:
+        print(file)
         output_files.append(localize_frames(file, 
                                             n_threads=n_threads, 
-                                            out_dir=out_dir, 
+                                            out_dir=out_dir,
+                                            subset_to_track=subset_to_track,
                                             **config))
     
     # Do tracking parallelized over the output files
@@ -190,20 +210,21 @@ def quot_fast_track(target_path: str,
 
 
 if __name__ == "__main__":
-    # Parse args
-    parser = argparse.ArgumentParser()
-    parser.add_argument('target_path')
-    parser.add_argument('config_path')
-    parser.add_argument("-e", "--ext", nargs='?', type=str, const=".nd2", default=".nd2")
-    parser.add_argument("-n", "--n_threads", nargs='?', type=int, const=1, default=1)
-    parser.add_argument("-o", "--out_dir", nargs='?', type=str, const=None, default=None)
-    parser.add_argument("-c", "--contains", nargs='?', type=str, const="*", default="*")
-    args = parser.parse_args()
 
-    # Run the fast tracking
-    quot_fast_track(args.target_path, 
-                    args.config_path, 
-                    args.ext, 
-                    args.n_threads, 
-                    args.out_dir, 
-                    args.contains)
+    # Option to track just a subset of frames. Added especially for PAPA/kPAPA experiments.
+    #subset_to_track = list(range(200,500))
+    subset_to_track = None
+      
+    basefname = '../'
+    prefixes = ['g','v']
+    
+    for prefix in prefixes:
+        current_run = f"{basefname}/{prefix}/"
+        quot_fast_track(current_run, 
+            'settings.toml', 
+            subset_to_track=subset_to_track,
+            n_threads=32,
+            out_dir = f"{basefname}/tracking_{prefix}/",
+            ext='tif',
+        )
+    

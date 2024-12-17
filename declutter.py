@@ -3,9 +3,9 @@ import os
 from shutil import move
 import re
 	
+# This version will shorten file names and move files to subfolders, named by prefix
 
-
-def declutter(directory,nfields):
+def declutter(directory,nfields,prefixes):
 
     os.makedirs(directory + '/other',exist_ok=True)
 
@@ -48,18 +48,19 @@ def declutter(directory,nfields):
             
             # Rename the file
             os.rename(directory + "/" + filename, directory + "/" + new_filename)
-	
-	
-if __name__ == '__main__':
-    # This example declutters files with 3 numerical fields in the current directory
-	nfields = 3
-    directory = "./"
-    declutter(directory,nfields)
-    
-    ## Here's an example of how to declutter files in multiple directories called "run1" through "run6"
-    ## with three numeric fields
-    # nfields = 3
-	# for directory in ["run" + str(j) for j in range(1,7)]:
-	#	declutter(directory,nfields)
 
+        
+    for prefix in prefixes:
+        os.makedirs(f'{directory}/{prefix}',exist_ok=True)
+        os.system(f'mv {directory}/{prefix}*tif {directory}/{prefix}/')
+
+
+if __name__ == '__main__':
+    nfields = 3 # be very careful not to set this too low!
+    
+    folders = ['run2']  # folders to declutter
+    prefixes = ['v','g','S','H']  # file name prefixes
+    
+    for folder in folders:
+        declutter(f'{folder}/',nfields,prefixes)
 
