@@ -1,12 +1,21 @@
 # OLS_analysis
 Single-molecule tracking analysis code for use with oblique line-scan (OLS) microscope
 
+# Basic workflow
+1. Declutter files using declutter2.py
+2. Track movies using quot_fast_track.py.
+
+# Contents
+
 ## declutter.py
 Script that declutters long TIF file names and moves all non-TIF files to an "other" folder
 declutter2.py - this version moves files with different prefixes to different subfolders.
 
 ## quot_fast_track.py
 Script from Vinson Fan for fast tracking of files with quot.
+quot_fast_track2.py - this version, which goes with declutter2.py, tracks files in different subfolders, whose
+# names are identical to the file name prefixes.
+
 
 ## settings.toml
 Settings file for quot particle tracking
