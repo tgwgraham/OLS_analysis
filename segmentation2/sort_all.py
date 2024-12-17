@@ -123,7 +123,7 @@ if __name__ == '__main__':
 
     maskprefix = 'H'            # prefix for mask file names
     maskfolder = 'masks'        # folder containing mask TIFs
-    trackfolder = '../tracking/'     # folder containing tracking CSVs
+    tracking_basefname = '../tracking'     # folder containing tracking CSVs
     outfolder = 'sorted_trajectories'   # output folder for CSVs sorted by cell
     prefixes = ['v','g']                # prefixes for SMT files
                                         # My current convention is to name the mask channel "H" followed
@@ -131,15 +131,15 @@ if __name__ == '__main__':
                                         # letter followed by the same number.
     write_background=False # Whether to write out a "0.csv" file for trajectories outside of any mask    
         
-    # get mask TIF file names
-    masknames = glob(f'{maskfolder}/{maskprefix}*tif')
-    # loop over each mask file and sort trajectories from corresponding trajectory file(s)
-    for j in range(len(masknames)):
-        for prefix in prefixes:
-            possible_trajfiles = glob(f'{trackfolder}{prefix}_{j:04d}*_trajs.csv')
+    for prefix in prefixes:
+        # get mask TIF file names
+        masknames = glob(f'{maskfolder}/{maskprefix}*tif')
+        # loop over each mask file and sort trajectories from corresponding trajectory file(s)
+        for j in range(len(masknames)):
+            possible_trajfiles = glob(f'{tracking_basefname}_{prefix}/{prefix}_{j:04d}*_trajs.csv')
             for trajfile in possible_trajfiles:
                 if os.path.exists(trajfile):
-                    trajbyroi(masknames[j],trajfile,outfolder,write_background=write_background)
+                    trajbyroi(masknames[j],trajfile,f"{outfolder}/{prefix}",write_background=write_background)
                 else:
                     print(f'Warning: {trajfile} not found.')
                 print(masknames[j],trajfile)
