@@ -3,6 +3,7 @@ Single-molecule tracking analysis code for use with oblique line-scan (OLS) micr
 
 ## declutter.py
 Script that declutters long TIF file names and moves all non-TIF files to an "other" folder
+declutter2.py - this version moves files with different prefixes to different subfolders.
 
 ## quot_fast_track.py
 Script from Vinson Fan for fast tracking of files with quot.
