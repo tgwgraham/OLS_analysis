@@ -25,7 +25,10 @@ Modification of script from Vinson Fan for fast tracking of files with quot.
 Settings file for quot particle tracking
 
 ## run_saspt_byprefix.py
-Runs SASPT on all TIF files with the same prefix. The prefix is defined as the part of the file name before the first digit, so you will need to modify this if your prefix contains numbers!
+Runs SASPT on all CSV files with the same prefix. The prefix is defined as the part of the file name before the first digit, so you will need to modify this if your prefix contains numbers!
+
+## run_saspt_files.py
+Wrapper script to run SASPT on a specific set of files. 
 
 ## track_and_saspt.sh
 Short bash script to run tracking and SASPT.
