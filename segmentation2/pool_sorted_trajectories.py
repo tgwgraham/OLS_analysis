@@ -52,15 +52,23 @@ def rewrite_trajectories(input_files, output_file, start_frame = None, end_frame
 
 if __name__ == "__main__":
     
-    maxfnum = 32 # maximum file number (inclusive)
-
-    gtraj = []
-    for j in range(maxfnum+1):
-        gtraj.extend(glob(f"{sorted_folder}/g_{j:04d}*/*csv"))
-
-    vtraj = []
-    for j in range(maxfnum+1):
-        vtraj.extend(glob(f"{sorted_folder}/v_{j:04d}*/*csv"))
+    sorted_folder = 'sorted_trajectories'
     
-    rewrite_trajectories(gtraj, 'allPAPA.csv', start_frame=40, end_frame=69)
-    rewrite_trajectories(vtraj, 'allDR.csv', start_frame=31, end_frame=60)
+    maxfnum = None # set this to something other than None if you want to impose a limit on the maximum file number (e.g., for including only time points prior to drug treatment)
+
+    prefixes = {'g':{'start_frame':40,'end_frame':70},
+                'v':{'start_frame':31,'end_frame':61}
+                }
+    
+    
+    for prefix in prefixes.keys():    
+        if maxfnum is not None:
+            traj = []
+            for j in range(maxfnum+1):
+                traj.extend(glob(f"{sorted_folder}/{prefix}/{prefix}_{j:04d}*/*csv")) 
+        else:
+            traj = glob(f"{sorted_folder}/{prefix}/{prefix}_*/*csv")
+        rewrite_trajectories(traj, f'{sorted_folder}/all_{prefix}.csv', 
+                                    start_frame=prefixes[prefix]['start_frame'], 
+                                    end_frame=prefixes[prefix]['end_frame'])
+
