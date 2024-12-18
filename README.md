@@ -35,6 +35,9 @@ Wrapper script to run SASPT on a specific set of files.
 ## track_and_saspt.sh
 Short bash script to run tracking and SASPT.
 
+## replot_saspt.ipynb
+For replotting output of SASPT.
+
 ## segmentation
 ### ols_seg.py
 Script that segments all TIF files in a folder.
