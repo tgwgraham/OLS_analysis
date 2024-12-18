@@ -5,13 +5,15 @@ Single-molecule tracking analysis code for use with oblique line-scan (OLS) micr
 1. Declutter files using declutter2.py - typically run this from the folder containing all of the runs for that experiment.
 2. Create an "analysis" folder within each run, and copy into it the following scripts:
 - quot_fast_track.py
+- run_saspt_files.py
 - segmentation2/ols_seg2.py
 - segmentation2/sort_all.py
-- run_saspt_byprefix.py
-2. Track movies using quot_fast_track2.py (typically run this from an analysis folder within the folder for each run).
+- segmentation2/pool_sorted_trajectories.py
+2. Track movies using quot_fast_track.py (typically run this from an analysis folder within the folder for each run).
 3. Segment snapshot images using ols_seg2.py (typically run this from an analysis folder within the folder for each run).
 4. Sort trajectories by cell using sort_all.py
-5. Run SASPT on sorted trajectories using run_saspt_byprefix.py.
+5. Pool sorted trajectories into a single file each for DR and PAPA (or whatever conditions are relevant to your experiment) using pool_sorted_trajectories.py.
+6. Run SASPT on sorted trajectories using run_saspt_files.py.
 
 # Contents
 
