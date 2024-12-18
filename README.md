@@ -4,7 +4,7 @@ Single-molecule tracking analysis code for use with oblique line-scan (OLS) micr
 # Basic workflow
 1. Declutter files using declutter2.py - typically run this from the folder containing all of the runs for that experiment.
 2. Create an "analysis" folder within each run, and copy into it the following scripts:
-- quot_fast_track2.py
+- quot_fast_track.py
 - segmentation2/ols_seg2.py
 - segmentation2/sort_all.py
 - run_saspt_byprefix.py
