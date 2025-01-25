@@ -86,6 +86,11 @@ def segment_and_filter(fname, outf = None, gauss_sigma=10, diameter=80,
         "perimeter": []
     }
 
+    # If there are no cells, exit the function
+    if len(properties) == 0:
+        return
+
+
     for prop in properties:
         region_data["label"].append(prop.label)
         region_data["area"].append(prop.area)
@@ -191,7 +196,7 @@ def plot_labeled_contours(image, label_array, regiondf, outfname=None):
 
 if __name__ == '__main__':
     
-    basefname = '../H'
+    basefname = '../H/'
     outfolder = 'masks'
     
     os.makedirs(outfolder,exist_ok=True)
@@ -202,31 +207,8 @@ if __name__ == '__main__':
         print(f"Analyzing {fname}")
         outf = f"{outfolder}/{os.path.split(fname)[-1][:-4]}"
         segment_and_filter(fname, outf = outf, gauss_sigma=10, diameter=80, 
-                    edgewidth = 20, perimthresh = 0.1, areathresh = 5000,
+                    edgewidth = 20, perimthresh = 0.2, areathresh = 5000,
                     other_imfnames = None, pretty_output=True,
                     )
     
-    
-    # infolder = sys.argv[1]
-    # outfolder = sys.argv[2]
-    
-    # fnames = glob(infolder + '*tif')
-    # os.makedirs(outfolder,exist_ok=True)
-
-    #Loop over all TIF files in the input folder
-    # for f in fnames:
-        # segmentfile(
-            # fname=f,
-            # outf=f'{outfolder}/{os.path.basename(f)[:-4]}',
-            # thresh1=config.get('thresh1', 120.0),
-            # thresh2=config.get('thresh2', -5),
-            # rad1=config.get('rad1', 3),
-            # rad2=config.get('rad2', 11),
-            # size_threshold=config.get('size_threshold', None),
-            # ybounds=config.get('ybounds', None),
-            # other_imfnames=config.get('other_imfnames', None),
-            # dilation_strelsize=config.get('dilation_strelsize', 3),
-            # dilation_nrounds=config.get('dilation_nrounds', 3),
-            # pretty_output=config.get('pretty_output', True)
-        # )
-   
+  
