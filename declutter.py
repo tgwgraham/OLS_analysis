@@ -3,7 +3,7 @@ import os
 from shutil import move
 import re
 	
-# This version will shorten file names and move files to subfolders, named by prefix
+
 
 def declutter(directory,nfields,prefixes):
 
@@ -56,11 +56,15 @@ def declutter(directory,nfields,prefixes):
 
 
 if __name__ == '__main__':
-    nfields = 3 # be very careful not to set this too low!
+    nfields = 1 # be very careful not to set this too low!
+    prefixes = ['v','g','S','H'] # file name prefixes of tif files
     
-    folders = ['run2']  # folders to declutter
-    prefixes = ['v','g','S','H']  # file name prefixes
+    # enter one folder per line
+    # It is convenient to use the "ls -1d" command at the command line to list directories and then copy and paste here.
+    folders = """run1
+    run2
+    run3"""
     
-    for folder in folders:
+    for folder in folders.split():
         declutter(f'{folder}/',nfields,prefixes)
 
