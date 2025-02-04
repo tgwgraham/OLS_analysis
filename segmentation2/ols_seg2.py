@@ -45,7 +45,7 @@ def segment_and_filter(fname, outf = None, gauss_sigma=10, diameter=80,
     # outf - base file name for output
     # gauss_sigma - standard deviation of gaussian to use for gaussian blurring
     # diameter - diameter to use for cell finding in Cellpose
-    # edgewidth - edge width to use for excluding boundary cells
+    # edgewidth - edge width in pixels to use for excluding boundary cells
     # perimthresh - max fraction of the cell perimeter that can be within edgewidth of the edge of the image
     # areathresh - minimum cell area
     # other_imfnames - names of other image files for getting their integrated intensities.
@@ -210,5 +210,15 @@ if __name__ == '__main__':
                     edgewidth = 20, perimthresh = 0.2, areathresh = 5000,
                     other_imfnames = None, pretty_output=True,
                     )
-    
+
+# fname - file name
+# outf - base file name for output
+# gauss_sigma - standard deviation of gaussian to use for gaussian blurring
+# diameter - diameter to use for cell finding in Cellpose
+# edgewidth - edge width in pixels to use for excluding boundary cells
+# perimthresh - max fraction of the cell perimeter that can be within edgewidth of the edge of the image
+# areathresh - minimum cell area
+# other_imfnames - names of other image files for getting their integrated intensities.
+# pretty_output - whether to make pretty overlay image
+
   
