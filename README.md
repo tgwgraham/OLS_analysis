@@ -38,7 +38,17 @@ Short bash script to run tracking and SASPT.
 ## replot_saspt.ipynb
 For replotting output of SASPT.
 
-## segmentation
+## segmentation2
+### ols_seg.py
+Script that segments all TIF files in a folder.
+
+### sort_all.py
+Sorts trajectories from tracked CSV files by cell. Makes a folder for each field of view containing one CSV file per cell. 0.csv contains background trajectories not in any cell.
+
+### pool_sorted_trajectories.py
+Combines sorted trajectories from file names with the same prefix. Useful for PAPA experiments when you are comparing PAPA and DR trajectories. Specify the frame range to use (i.e., frames after the reactivation pulse for PAPA experiments).
+
+## segmentation (old version)
 ### ols_seg.py
 Script that segments all TIF files in a folder.
 
@@ -53,3 +63,4 @@ Sorts trajectories from tracked CSV files by cell. Makes a folder for each field
 
 ### check_sorting.ipynb
 Can be used to make overlay plots to check the quality of trajectory sorting.
+
